@@ -1,0 +1,6 @@
+apiVersion: v2
+name: ai-recommendation-service
+description: A Helm chart for ai-recommendation-service
+type: application
+version: 0.1.0
+appVersion: "1.0.0"

@@ -1,0 +1,29 @@
+replicaCount: 2
+
+image:
+  repository: your-dockerhub-username/ai-recommendation-service
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 8000
+
+env:
+  DATABASE_URL: ""
+  JWT_SECRET: ""
+  RABBITMQ_URL: ""
+
+resources:
+  requests:
+    memory: "128Mi"
+    cpu: "100m"
+  limits:
+    memory: "256Mi"
+    cpu: "300m"
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 60

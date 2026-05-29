@@ -1,0 +1,29 @@
+name: CD — Update image tags
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+    branches: [main]
+
+jobs:
+  update-helm-values:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_PAT }}
+
+      - name: Update image tags in Helm values
+        run: |
+          for service in auth-service product-service order-service inventory-service payment-service; do
+            sed -i "s/tag: .*/tag: ${{ github.sha }}/" kubernetes/helm/$service/values.yaml
+          done
+
+      - name: Commit updated values
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git commit -am "ci: update image tags to ${{ github.sha }}"
+          git push

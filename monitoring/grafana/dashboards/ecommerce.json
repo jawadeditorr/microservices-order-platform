@@ -1,0 +1,52 @@
+{
+  "title": "E-Commerce Microservices",
+  "timezone": "browser",
+  "panels": [
+    {
+      "title": "Request Rate per Service (RPS)",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "sum(rate(http_requests_total[1m])) by (job)",
+          "legendFormat": "{{job}}"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 }
+    },
+    {
+      "title": "Error Rate (HTTP 5xx)",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "sum(rate(http_requests_total{status_code=~\"5..\"}[1m])) by (job) / sum(rate(http_requests_total[1m])) by (job) * 100",
+          "legendFormat": "{{job}}"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 }
+    },
+    {
+      "title": "P95 Response Time (Seconds)",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le, job))",
+          "legendFormat": "{{job}}"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 }
+    },
+    {
+      "title": "Active Replicas",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "count(kube_pod_info{namespace=\"ecommerce\"}) by (created_by_name)",
+          "legendFormat": "{{created_by_name}}"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 }
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 30
+}
