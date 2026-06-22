@@ -25,6 +25,8 @@ logger = logging.getLogger("ai_service")
 # Initialize app
 app = FastAPI(title="AI Recommendation Service")
 
+Instrumentator().instrument(app).expose(app)
+
 # Initialize Anthropic client
 anthropic_client = AsyncAnthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 
@@ -35,7 +37,6 @@ db_pool = None
 async def startup_event():
     global db_pool
     db_pool = await get_db_pool()
-    Instrumentator().instrument(app).expose(app)
     logger.info("AI Recommendation Service started")
 
 @app.on_event("shutdown")

@@ -34,4 +34,27 @@ const getClient = async () => {
   return client;
 };
 
+const fs = require('fs');
+const path = require('path');
+
+const runMigrations = async () => {
+  try {
+    const migrationsDir = path.join(__dirname, 'migrations');
+    if (!fs.existsSync(migrationsDir)) return;
+    
+    const files = fs.readdirSync(migrationsDir).filter(f => f.endsWith('.sql')).sort();
+    for (const file of files) {
+      const filePath = path.join(migrationsDir, file);
+      const sql = fs.readFileSync(filePath, 'utf8');
+      logger.info(`Running database migration: ${file}`);
+      await pool.query(sql);
+      logger.info(`Migration completed: ${file}`);
+    }
+  } catch (error) {
+    logger.error('Failed to run database migrations', { error: error.message });
+  }
+};
+
+runMigrations();
+
 module.exports = { pool, query, getClient };

@@ -1,7 +1,7 @@
 FROM node:20-alpine AS base
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci --only=production && npm cache clean --force
+RUN npm install --omit=dev && npm cache clean --force
 
 FROM node:20-alpine AS production
 WORKDIR /app
@@ -9,7 +9,8 @@ RUN addgroup -g 1001 -S nodejs && adduser -S nodeuser -u 1001
 COPY --from=base /app/node_modules ./node_modules
 COPY --from=base /app/package*.json ./
 COPY src/ ./src/
-COPY ../shared/ ./shared/
+COPY --from=shared . /shared/
+ENV NODE_PATH=/app/node_modules
 USER nodeuser
 EXPOSE 3002
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \

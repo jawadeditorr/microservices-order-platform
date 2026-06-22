@@ -15,6 +15,7 @@ async def get_db_pool():
         
         # Register pgvector type with asyncpg
         async with pool.acquire() as conn:
+            await conn.execute('CREATE EXTENSION IF NOT EXISTS vector;')
             await register_vector(conn)
             
         logger.info("Connected to PostgreSQL and registered pgvector")
